@@ -40,6 +40,8 @@ class Purgecss {
     ignore: boolean = false
 
     constructor(options: Options | string) {
+        fs.unlink('purgecss-rejected.txt');
+        
         if (typeof options === 'string' || typeof options === 'undefined')
             options = this.loadConfigFile(options)
         this.checkOptions(options)
@@ -315,6 +317,10 @@ class Purgecss {
                     keepSelector = this.shouldKeepSelector(selectors, selectorsInRule)
 
                     if (!keepSelector) {
+                        fs.appendFile('purgecss-rejected.txt', selector.toString() + '\r\n', function (err) {
+							if (err) throw err;
+						})
+                        
                         if (this.options.rejected) this.selectorsRemoved.add(selector.toString())
                         selector.remove()
                     }
